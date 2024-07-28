@@ -1,0 +1,24 @@
+version: '3.1'
+
+services:
+  db:
+    image: mysql:8.2
+    container_name: mysql_product
+    restart: always
+    environment:
+      MYSQL_DATABASE: product
+      MYSQL_USER: product
+      MYSQL_PASSWORD: product
+      MYSQL_ROOT_PASSWORD: product
+    ports:
+      - "7010:3306"
+    # (this is just an example, not intended to be a production configuration)
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    restart: always
+    ports:
+      - "7033:80"
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: product
