@@ -21,10 +21,10 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @GetMapping("/getProductsFromService")
-    public String placeOrder(){
-        orderService.placeOrder();
-        return "Order is successfully gotten";
+    @PostMapping("/getProductsFromService")
+    public String placeOrder(@RequestBody OrderRequestDto orderRequestDto){
+        orderService.placeOrder(orderRequestDto);
+        return "Order is successfully placed";
     }
 
 //        @PostMapping("/create_order")
@@ -40,7 +40,9 @@ public class OrderController {
         List<Product> list = new ArrayList<>();
         Product product1 = new Coffee("Coffee","Cof22",5,"Egypt"); // no Id is specified here be careful
         list.add(product1);
-        return new OrderRequestDto("COFF_2",list,"Smith");
+        OrderRequestDto orderRequestDto = new OrderRequestDto("COFF_2",list,"Smith");
+        System.out.println(orderRequestDto.getOrderNumber());
+        return orderRequestDto;
     }
 
     @GetMapping("/str")

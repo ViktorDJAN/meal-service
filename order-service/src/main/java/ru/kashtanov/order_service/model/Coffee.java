@@ -1,10 +1,5 @@
 package ru.kashtanov.order_service.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-
-import java.util.Objects;
-
 
 public class Coffee extends Product {
     private String country;
@@ -12,8 +7,8 @@ public class Coffee extends Product {
     public Coffee() {
     }
 
-    public Coffee(Long productId, String productName, String skuCode, Integer quantity, String country) {
-        super(productId, productName, skuCode, quantity);
+    public Coffee(Long id, String productName, String skuCode, Integer quantity, String country) {
+        super(id, productName, skuCode, quantity);
         this.country = country;
     }
 

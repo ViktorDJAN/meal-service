@@ -10,10 +10,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/product_scope")
-public class Controller {
+public class ProductController {
     private final ProductService productService;
 
-    public Controller(ProductService productService) {
+    public ProductController(ProductService productService) {
         this.productService = productService;
     }
 
@@ -33,7 +33,7 @@ public class Controller {
     }
 
     @GetMapping("/coffee_in_stock")
-    public List<Product>getCoffeeInStock(){
-        return productService.getProductInStockList();
+    public List<Product>getCoffeeInStock(@RequestParam List<String> skuCodes) {
+        return productService.getProductInStockList(skuCodes);
     }
 }

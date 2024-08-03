@@ -2,16 +2,12 @@ package ru.kashtanov.order_service.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriBuilder;
 import ru.kashtanov.order_service.dto.OrderRequestDto;
-import ru.kashtanov.order_service.dto.ProductResponseDto;
-import ru.kashtanov.order_service.model.Coffee;
 import ru.kashtanov.order_service.model.Order;
 import ru.kashtanov.order_service.model.Product;
 import ru.kashtanov.order_service.repository.OrderRepository;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -45,25 +41,48 @@ public class OrderService {
 //        System.out.println(productArrayList.get(0) + "1_element");
 //        orderRepository.save(new Order(orderNumberCounter,"MR_SPIDER",productArrayList));
 
-        public void placeOrder(){
-          Coffee[] coffees =  webClientBuilder.build().get() // get() starts build *get http request*
-                  .uri("http://roduct-service/api/v1/product_scope/coffee_in_stock",
-                          UriBuilder::build)
-                  .retrieve()
-                  .bodyToMono(Coffee[].class).block();
+//    List<Product> products = new ArrayList<>(); /////////////////////////////////////////////////___WORKING_SNIPPET
+//    Coffee[] coffees = webClientBuilder.build().get() // get() starts build *get http request*
+//            .uri("http://localhost:8087/api/v1/product_scope/coffee_in_stock",
+//                    UriBuilder::build)
+//            .retrieve()
+//            .bodyToMono(Coffee[].class).block();
 
-            for(Coffee coffee:coffees){
-                System.out.println(coffee);
+
+
+    public void placeOrder(OrderRequestDto orderRequestDto) {
+        System.out.println(orderRequestDto.getProductListList().get(0).getId() +" : ID HERE");
+        List<String>skuCodes = new ArrayList<>();
+        List<Product>products = new ArrayList<>();
+        orderRequestDto.getProductListList().forEach(product -> skuCodes.add(product.getSkuCode()));
+        System.out.println(skuCodes + "_________here");
+
+        Product[] coffees = webClientBuilder.build().get() // get() starts build *get http request*
+                .uri("http://localhost:8087/api/v1/product_scope/coffee_in_stock",
+                        uriBuilder -> uriBuilder.queryParam("skuCodes",skuCodes).build())
+                .retrieve()
+                .bodyToMono(Product[].class).block();
+        for(Product product:coffees){
+
+            System.out.println(product + "___in order service ___ID__=" + product.getId());
+        }
+
+        if (coffees != null) {
+            try {
+                products.addAll(List.of(coffees));
+            } catch (NullPointerException e) {
+                throw new RuntimeException();
             }
+        }
+        System.out.println(products +": PRODUCTS LIST");
 
 
 
-
-
-//        orderRepository.save(new Order(orderRequestDto.getOrderNumber()
-//                ,orderRequestDto.getOwnerName(),orderRequestDto.getProductListList()));
+        orderRepository.save(new Order(orderRequestDto.getOrderNumber()
+                ,orderRequestDto.getOwnerName(),products));
     }
-    public List<Order> getOrderList(){
+
+    public List<Order> getOrderList() {
         return orderRepository.findAll();
     }
 }

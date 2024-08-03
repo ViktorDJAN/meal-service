@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:8010/postgres
+    username: notification
+    password: notification
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+  application:
+    name: notification-service
+
+server:
+  port: 8088
+
+eureka:
+ client:
+  serviceUrl:
+    defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}

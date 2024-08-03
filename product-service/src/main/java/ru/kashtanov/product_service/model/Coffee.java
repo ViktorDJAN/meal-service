@@ -19,6 +19,11 @@ public class Coffee extends Product{
         this.country = country;
     }
 
+    public Coffee(Long id, String productName, String skuCode, String country) {
+        super(id, productName, skuCode);
+        this.country = country;
+    }
+
     public String getCountry() {
         return country;
     }

@@ -7,7 +7,7 @@ import java.util.Objects;
 @Embeddable
 public class Product {
 
-    private Long productId;
+    private Long id;
     private String productName;
     private String skuCode;
     private Integer quantity;
@@ -15,14 +15,14 @@ public class Product {
     public Product() {
     }
 
-    public Product(Long productId, String productName, String skuCode) {
-        this.productId = productId;
+    public Product(Long id, String productName, String skuCode) {
+        this.id = id;
         this.productName = productName;
         this.skuCode = skuCode;
     }
 
-    public Product(Long productId, String productName, String skuCode, Integer quantity) {
-        this.productId = productId;
+    public Product(Long id, String productName, String skuCode, Integer quantity) {
+        this.id = id;
         this.productName = productName;
         this.skuCode = skuCode;
         this.quantity = quantity;
@@ -39,12 +39,12 @@ public class Product {
         this.skuCode = skuCode;
     }
 
-    public Long getProductId() {
-        return productId;
+    public Long getId() {
+        return id;
     }
 
-    public void setProductId(Long productId) {
-        this.productId = productId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getProductName() {
@@ -76,13 +76,21 @@ public class Product {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Product product = (Product) o;
-        return Objects.equals(productId, product.productId) && Objects.equals(productName, product.productName) && Objects.equals(skuCode, product.skuCode);
+        return Objects.equals(id, product.id) && Objects.equals(productName, product.productName) && Objects.equals(skuCode, product.skuCode);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(productId, productName, skuCode);
+        return Objects.hash(id, productName, skuCode);
     }
 
-
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", productName='" + productName + '\'' +
+                ", skuCode='" + skuCode + '\'' +
+                ", quantity=" + quantity +
+                '}';
+    }
 }
