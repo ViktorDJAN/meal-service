@@ -1,0 +1,35 @@
+version: "3.9"
+services:
+  pgsql:
+    image: postgres:13-alpine3.14
+    container_name:  notification-service-docker-db
+    restart: always
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: notification
+      POSTGRES_PASSWORD: notification
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - pgsql-data:/var/lib/postgresql/data
+    ports:
+      - "8010:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4:4.19
+    container_name:  PgAdmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: notification@notification.com
+      PGADMIN_DEFAULT_PASSWORD: notification
+      PGADMIN_LISTEN_PORT: 80
+    ports:
+      - "8011:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    links:
+      - pgsql:pgsql-server
+
+volumes:
+  pgsql-data:
+  pgadmin-data:
+
