@@ -1,8 +1,10 @@
 package ru.kashtanov.order_service.service;
 
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.kashtanov.order_service.dto.OrderRequestDto;
+import ru.kashtanov.order_service.event.OrderEvent;
 import ru.kashtanov.order_service.model.Order;
 import ru.kashtanov.order_service.model.Product;
 import ru.kashtanov.order_service.repository.OrderRepository;
@@ -12,13 +14,15 @@ import java.util.List;
 
 @Service
 public class OrderService {
-    private static String orderNumberCounter = "ORD-";
+
     private final OrderRepository orderRepository;
     private final WebClient.Builder webClientBuilder;
+    private final KafkaTemplate<String, OrderEvent> kafkaTemplate;
 
-    public OrderService(OrderRepository orderRepository, WebClient.Builder webClientBuilder) {
+    public OrderService(OrderRepository orderRepository, WebClient.Builder webClientBuilder, KafkaTemplate<String, OrderEvent> kafkaTemplate) {
         this.orderRepository = orderRepository;
         this.webClientBuilder = webClientBuilder;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
 //    public void placeOrder(OrderRequestDto orderRequestDto){
@@ -49,20 +53,19 @@ public class OrderService {
 //            .bodyToMono(Coffee[].class).block();
 
 
-
     public void placeOrder(OrderRequestDto orderRequestDto) {
-        System.out.println(orderRequestDto.getProductListList().get(0).getId() +" : ID HERE");
-        List<String>skuCodes = new ArrayList<>();
-        List<Product>products = new ArrayList<>();
+        System.out.println(orderRequestDto.getProductListList().get(0).getId() + " : ID HERE");
+        List<String> skuCodes = new ArrayList<>();
+        List<Product> products = new ArrayList<>();
         orderRequestDto.getProductListList().forEach(product -> skuCodes.add(product.getSkuCode()));
         System.out.println(skuCodes + "_________here");
 
         Product[] coffees = webClientBuilder.build().get() // get() starts build *get http request*
                 .uri("http://localhost:8087/api/v1/product_scope/coffee_in_stock",
-                        uriBuilder -> uriBuilder.queryParam("skuCodes",skuCodes).build())
+                        uriBuilder -> uriBuilder.queryParam("skuCodes", skuCodes).build())
                 .retrieve()
                 .bodyToMono(Product[].class).block();
-        for(Product product:coffees){
+        for (Product product : coffees) {
 
             System.out.println(product + "___in order service ___ID__=" + product.getId());
         }
@@ -74,12 +77,13 @@ public class OrderService {
                 throw new RuntimeException();
             }
         }
-        System.out.println(products +": PRODUCTS LIST");
+        System.out.println(products + ": PRODUCTS LIST");
+        Order order = new Order(orderRequestDto.getOrderNumber()
+                , orderRequestDto.getOwnerName(), products);
+        orderRepository.save(order);
 
-
-
-        orderRepository.save(new Order(orderRequestDto.getOrderNumber()
-                ,orderRequestDto.getOwnerName(),products));
+        kafkaTemplate.send("notification_topic", new OrderEvent(order.getOrderNumber()));
+        System.out.println("OrderService_orderNUM: " + order.getOrderNumber());
     }
 
     public List<Order> getOrderList() {
